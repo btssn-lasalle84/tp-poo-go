@@ -1,0 +1,34 @@
+{
+  "tests": [
+    {
+      "name": "TestCompteBancaireAccesseurs",
+      "setup": "",
+      "run": "cd compte && export HOME=/home/runner; go test compte.go compte_accesseurs_test.go",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 4
+    },
+    {
+      "name": "TestCompteBancaire",
+      "setup": "",
+      "run": "cd compte && export HOME=/home/runner; go test compte.go compte_test.go",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 4
+    },
+    {
+      "name": "TestCompteBancaireAffiche",
+      "setup": "",
+      "run": "cd compte && export HOME=/home/runner; go test compte.go compte_affichage_test.go",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 2
+    }
+  ]
+}

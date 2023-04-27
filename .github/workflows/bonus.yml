@@ -1,0 +1,68 @@
+name: Bonus GUI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.16.1"
+          check-latest: true
+
+      - name: Install fyne
+        shell: bash
+        run: |
+          sudo apt-get install -y libgl1-mesa-dev xorg-dev
+          go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Run test
+        id: test
+        continue-on-error: true
+        shell: bash
+        run: |
+          label="bonus-gui-fyne"
+          echo "##[set-output name=label;]${label}"
+          cd fyne/compte/ && go mod tidy && go test -v compte.go compte_test.go
+          res=$?
+          if [ $res -eq 0 ]
+          then
+            retour="passing"
+            color="green"
+          else
+            retour="failing"
+            color="red"
+          fi
+          echo "##[set-output name=status;]${retour}"
+          echo "##[set-output name=color;]${color}"
+
+      # switch to badges branch
+      - run: |
+          git checkout badge_bonus || git checkout -b badge_bonus
+          test -d .github/badges || mkdir -p .github/badges
+
+      # create badge
+      - name: badge
+        uses: emibcn/badge-action@v1.2.1
+        with:
+          label: ${{ steps.test.outputs.label }}
+          status: ${{ steps.test.outputs.status || 'failing' }}
+          color: ${{ steps.test.outputs.color || 'red' }}
+          path: ".github/badges/badge_bonus.svg"
+
+      # commit and push badges if badges have changed
+      - name: Commit changes to badge
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add '.github/badges/badge_bonus.svg'
+          git commit -m "Add/Update badge_bonus" || exit 0
+          git push -f origin badge_bonus
